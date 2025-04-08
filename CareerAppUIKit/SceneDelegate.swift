@@ -34,11 +34,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
         let worker = ArticlesWorker()
         let presenter = ArticlesPresenter()
+        
         let interactor = ArticlesInteractor(presenter: presenter, worker: worker)
         let router = ArticlesRouter()
         
         
         let viewController = ArticlesViewController(interactor: interactor)
+        presenter.viewController = viewController
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }

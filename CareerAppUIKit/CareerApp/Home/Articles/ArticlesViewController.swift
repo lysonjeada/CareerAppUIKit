@@ -7,8 +7,6 @@
 
 import UIKit
 
-// MARK: - ViewController
-
 class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     var interactor: ArticlesBusinessLogic?
     var router: (NSObjectProtocol & ArticlesRoutingLogic & ArticlesDataStore)?
@@ -63,10 +61,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
-        DispatchQueue.main.async {
-            self.loadArticles()
-        }
-        
+        loadArticles()
     }
     
     // MARK: - Setup Methods
@@ -94,27 +89,30 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     
     // MARK: - Data Loading
     private func loadArticles() {
-        activityIndicator.startAnimating()
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.startAnimating()
+        }
         let request = Articles.FetchArticles.Request()
         interactor?.fetchArticles(request: request)
     }
     
     // MARK: - ArticlesDisplayLogic
     func displayArticles(_ articles: [Article]) {
-        activityIndicator.stopAnimating()
-
-        self.articles = articles
-        self.collectionView.reloadData()
-            
-//            self.pageControl.numberOfPages = self.articles.count
-       
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.stopAnimating()
+            self?.articles = articles
+            self?.collectionView.reloadData()
+            self?.pageControl.numberOfPages = articles.count
+        }
     }
     
     func displayError(_ error: String) {
-        activityIndicator.stopAnimating()
-        let alert = UIAlertController(title: "Error", message: error, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alert, animated: true)
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.stopAnimating()
+            let alert = UIAlertController(title: "Error", message: error, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self?.present(alert, animated: true)
+        }
     }
 }
 
@@ -125,7 +123,7 @@ extension ArticlesViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ArticleCell", for: indexPath) as! ArticleCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as! ArticleCell
         
         if articles.isEmpty {
 //            cell.configureAsLoading()
@@ -138,7 +136,7 @@ extension ArticlesViewController: UICollectionViewDataSource {
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
-extension ArticlesViewController: UICollectionViewDelegateFlowLayout, UICollectionViewDelegate {
+extension ArticlesViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
