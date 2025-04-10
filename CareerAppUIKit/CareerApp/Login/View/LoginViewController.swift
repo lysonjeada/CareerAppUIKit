@@ -19,7 +19,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     // MARK: UI Components
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Login"
+        label.text = LoginStrings.title
         label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         label.textColor = .persianBlue
         return label
@@ -27,7 +27,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let subtitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "Faça o login para continuar"
+        label.text = LoginStrings.subtitle
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .gray
         return label
@@ -35,7 +35,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let emailLabel: UILabel = {
         let label = UILabel()
-        label.text = "EMAIL"
+        label.text = LoginStrings.emailLabel
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .gray
         return label
@@ -44,7 +44,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     private let emailTextField: UITextField = {
         let tf = UITextField()
         tf.borderStyle = .roundedRect
-        tf.placeholder = "Digite seu email"
+        tf.placeholder = LoginStrings.emailPlaceholder
         tf.keyboardType = .emailAddress
         tf.autocapitalizationType = .none
         return tf
@@ -52,7 +52,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let passwordLabel: UILabel = {
         let label = UILabel()
-        label.text = "SENHA"
+        label.text = LoginStrings.passwordLabel
         label.font = UIFont.systemFont(ofSize: 12)
         label.textColor = .gray
         return label
@@ -61,14 +61,14 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     private let passwordTextField: UITextField = {
         let passwordTextField = UITextField()
         passwordTextField.borderStyle = .roundedRect
-        passwordTextField.placeholder = "Digite sua senha"
+        passwordTextField.placeholder = LoginStrings.passwordPlaceholder
         passwordTextField.isSecureTextEntry = true
         return passwordTextField
     }()
     
     private let loginButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Log in", for: .normal)
+        button.setTitle(LoginStrings.loginButton, for: .normal)
         button.backgroundColor = .persianBlue
         button.layer.cornerRadius = 10
         return button
@@ -76,7 +76,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let loginWithoutCredentialsButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Entrar sem login", for: .normal)
+        button.setTitle(LoginStrings.loginWithoutCredentials, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
         button.backgroundColor = .white
         button.layer.cornerRadius = 10
@@ -87,7 +87,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let forgotPasswordButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Esqueceu a senha?", for: .normal)
+        button.setTitle(LoginStrings.forgotPassword, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         return button
@@ -95,7 +95,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     
     private let signupButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Cadastre-se", for: .normal)
+        button.setTitle(LoginStrings.signup, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 12)
         return button
@@ -195,8 +195,8 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
     }
     
     func showLoginError(_ message: String) {
-        let alert = UIAlertController(title: "Erro", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        let alert = UIAlertController(title: LoginStrings.errorTitle, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: LoginStrings.okButton, style: .default))
         present(alert, animated: true)
     }
 }

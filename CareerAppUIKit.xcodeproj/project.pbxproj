@@ -14,17 +14,29 @@
 		702E966C2DA06B5700C5EF1D /* Exceptions for "CareerAppUIKit" folder in "CareerAppUIKit" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				CareerApp/Login/Resources/Localizable.strings,
 				Info.plist,
 			);
 			target = 702E96592DA06B5400C5EF1D /* CareerAppUIKit */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		701357F72DA876F4005C86B8 /* Exceptions for "CareerAppUIKit" folder in "Compile Sources" phase from "CareerAppUIKit" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 702E96562DA06B5400C5EF1D /* Sources */;
+			membershipExceptions = (
+				CareerApp/Login/Resources/Localizable.strings,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		702E965C2DA06B5400C5EF1D /* CareerAppUIKit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				702E966C2DA06B5700C5EF1D /* Exceptions for "CareerAppUIKit" folder in "CareerAppUIKit" target */,
+				701357F72DA876F4005C86B8 /* Exceptions for "CareerAppUIKit" folder in "Compile Sources" phase from "CareerAppUIKit" target */,
 			);
 			path = CareerAppUIKit;
 			sourceTree = "<group>";

@@ -1,0 +1,28 @@
+//
+//  Localizable.swift
+//  CareerAppUIKit
+//
+//  Created by Amaryllis Baldrez on 10/04/25.
+//
+
+// Títulos
+"login.title" = "Login";
+"login.subtitle" = "Faça o login para continuar";
+
+// Labels
+"login.email.label" = "EMAIL";
+"login.password.label" = "SENHA";
+
+// Placeholders
+"login.email.placeholder" = "Digite seu email";
+"login.password.placeholder" = "Digite sua senha";
+
+// Botões
+"login.button" = "Log in";
+"login.without_credentials.button" = "Entrar sem login";
+"login.forgot_password.button" = "Esqueceu a senha?";
+"login.signup.button" = "Cadastre-se";
+
+// Alertas
+"login.error.title" = "Erro";
+"login.error.ok_button" = "OK";

@@ -6,7 +6,8 @@
 //
 
 protocol LoginDataStore {
-    // Pode adicionar propriedades se necessário
+    var userEmail: String? { get set }
+    var authToken: String? { get set }
 }
 
 enum Login {
@@ -19,11 +20,6 @@ enum Login {
         struct Response {
             let success: Bool
             let error: Error?
-        }
-        
-        struct ViewModel {
-            let success: Bool
-            let errorMessage: String?
         }
     }
 }

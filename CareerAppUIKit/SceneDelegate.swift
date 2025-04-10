@@ -32,15 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         //    }
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        let interactor = LoginInteractor()
-        let presenter = LoginPresenter()
-        let router = LoginRouter()
-        let viewController = LoginViewController()
-        viewController.interactor = interactor
-        viewController.router = router
-        interactor.presenter = presenter
-        presenter.viewController = viewController
-        router.viewController = viewController
+        let viewController = LoginFactory.build()
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
