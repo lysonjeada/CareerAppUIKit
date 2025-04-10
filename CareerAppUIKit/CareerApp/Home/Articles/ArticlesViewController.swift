@@ -16,23 +16,23 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 0
-        let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        cv.backgroundColor = .clear
-        cv.isPagingEnabled = true
-        cv.showsHorizontalScrollIndicator = false
-        cv.translatesAutoresizingMaskIntoConstraints = false
-        cv.delegate = self
-        cv.dataSource = self
-        cv.register(ArticleCell.self, forCellWithReuseIdentifier: ArticleCell.identifier)
-        return cv
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .clear
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(ArticleCell.self, forCellWithReuseIdentifier: ArticleCell.identifier)
+        return collectionView
     }()
     
     private lazy var pageControl: UIPageControl = {
-        let pc = UIPageControl()
-        pc.currentPageIndicatorTintColor = .systemBlue
-        pc.pageIndicatorTintColor = .lightGray
-        pc.translatesAutoresizingMaskIntoConstraints = false
-        return pc
+        let pageControl = UIPageControl()
+        pageControl.currentPageIndicatorTintColor = .persianBlue
+        pageControl.pageIndicatorTintColor = .lightGray
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        return pageControl
     }()
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
@@ -59,6 +59,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupNavigationBar()
         setupViews()
         setupConstraints()
         loadArticles()
@@ -74,17 +75,34 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            collectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.6),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -240),
             
-            pageControl.bottomAnchor.constraint(equalTo: collectionView.topAnchor, constant: -20),
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            // Alteração aqui - agora referenciando o bottom da collectionView
+            pageControl.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
+            pageControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
+    }
+    
+    private func setupNavigationBar() {
+        title = "Artigos"
+        navigationController?.navigationBar.prefersLargeTitles = false
+        
+        // Opcional: personalizar a aparência da navigation bar
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .systemBackground
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.persianBlue]
+        
+        navigationController?.navigationBar.standardAppearance = appearance
+        navigationController?.navigationBar.scrollEdgeAppearance = appearance
+        navigationController?.navigationBar.compactAppearance = appearance
     }
     
     // MARK: - Data Loading
@@ -126,7 +144,7 @@ extension ArticlesViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as! ArticleCell
         
         if articles.isEmpty {
-//            cell.configureAsLoading()
+            //            cell.configureAsLoading()
         } else {
             cell.configure(with: articles[indexPath.item])
         }

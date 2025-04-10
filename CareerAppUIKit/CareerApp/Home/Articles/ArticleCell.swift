@@ -57,7 +57,7 @@ class ArticleCell: UICollectionViewCell {
     private let tagsLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .systemBlue
+        label.textColor = .persianBlue
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
