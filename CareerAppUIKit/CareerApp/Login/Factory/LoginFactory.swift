@@ -12,7 +12,7 @@ enum LoginFactory {
         let router = LoginRouter()
         let viewController = LoginViewController()
         viewController.interactor = interactor
-        viewController.router = router
+        interactor.router = router
         interactor.presenter = presenter
         presenter.viewController = viewController
         router.loginViewController = viewController

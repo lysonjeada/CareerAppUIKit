@@ -10,10 +10,14 @@ import Foundation
 protocol LoginBusinessLogic {
     func login(request: Login.Login.Request)
     func loginWithoutCredentials()
+    func routeToArticles()
 }
+
+typealias LoginRouterType = (NSObjectProtocol & LoginRoutingLogic & LoginDataStore)
 
 class LoginInteractor: LoginBusinessLogic {
     var presenter: LoginPresentationLogic?
+    var router: LoginRouterType?
     
     func login(request: Login.Login.Request) {
         if request.email.isEmpty || request.password.isEmpty {
@@ -27,5 +31,9 @@ class LoginInteractor: LoginBusinessLogic {
     
     func loginWithoutCredentials() {
         presenter?.presentLoginSuccess()
+    }
+    
+    func routeToArticles() {
+        router?.routeToArticles()
     }
 }

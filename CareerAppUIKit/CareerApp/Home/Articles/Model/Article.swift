@@ -37,13 +37,6 @@ struct User: Codable {
 
 enum Articles {
     struct FetchArticles {
-        struct Request { }
-        
-        struct Response {
-            let articles: [Article]
-            let error: Error?
-        }
-        
         struct ViewModel {
             struct DisplayedArticle {
                 let title: String

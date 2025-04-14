@@ -12,12 +12,26 @@ protocol LoginDisplayLogic: AnyObject {
     func showLoginError(_ message: String)
 }
 
-class LoginViewController: UIViewController, LoginDisplayLogic {
+final class LoginViewController: UIViewController, LoginDisplayLogic {
     var interactor: LoginBusinessLogic?
-    var router: (NSObjectProtocol & LoginRoutingLogic & LoginDataStore)?
     
-    // MARK: UI Components
-    private let titleLabel: UILabel = {
+    // MARK: - UI Components
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private lazy var buttonsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.distribution = .equalSpacing
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
+    private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = LoginStrings.title
         label.font = UIFont.systemFont(ofSize: 28, weight: .bold)
@@ -25,7 +39,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return label
     }()
     
-    private let subtitleLabel: UILabel = {
+    private lazy var subtitleLabel: UILabel = {
         let label = UILabel()
         label.text = LoginStrings.subtitle
         label.font = UIFont.systemFont(ofSize: 14)
@@ -33,7 +47,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return label
     }()
     
-    private let emailLabel: UILabel = {
+    private lazy var emailLabel: UILabel = {
         let label = UILabel()
         label.text = LoginStrings.emailLabel
         label.font = UIFont.systemFont(ofSize: 12)
@@ -41,16 +55,16 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return label
     }()
     
-    private let emailTextField: UITextField = {
-        let tf = UITextField()
-        tf.borderStyle = .roundedRect
-        tf.placeholder = LoginStrings.emailPlaceholder
-        tf.keyboardType = .emailAddress
-        tf.autocapitalizationType = .none
-        return tf
+    private lazy var emailTextField: UITextField = {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.placeholder = LoginStrings.emailPlaceholder
+        textField.keyboardType = .emailAddress
+        textField.autocapitalizationType = .none
+        return textField
     }()
     
-    private let passwordLabel: UILabel = {
+    private lazy var passwordLabel: UILabel = {
         let label = UILabel()
         label.text = LoginStrings.passwordLabel
         label.font = UIFont.systemFont(ofSize: 12)
@@ -58,15 +72,15 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return label
     }()
     
-    private let passwordTextField: UITextField = {
-        let passwordTextField = UITextField()
-        passwordTextField.borderStyle = .roundedRect
-        passwordTextField.placeholder = LoginStrings.passwordPlaceholder
-        passwordTextField.isSecureTextEntry = true
-        return passwordTextField
+    private lazy var passwordTextField: UITextField = {
+        let textField = UITextField()
+        textField.borderStyle = .roundedRect
+        textField.placeholder = LoginStrings.passwordPlaceholder
+        textField.isSecureTextEntry = true
+        return textField
     }()
     
-    private let loginButton: UIButton = {
+    private lazy var loginButton: UIButton = {
         let button = UIButton()
         button.setTitle(LoginStrings.loginButton, for: .normal)
         button.backgroundColor = .persianBlue
@@ -74,7 +88,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return button
     }()
     
-    private let loginWithoutCredentialsButton: UIButton = {
+    private lazy var loginWithoutCredentialsButton: UIButton = {
         let button = UIButton()
         button.setTitle(LoginStrings.loginWithoutCredentials, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
@@ -85,7 +99,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return button
     }()
     
-    private let forgotPasswordButton: UIButton = {
+    private lazy var forgotPasswordButton: UIButton = {
         let button = UIButton()
         button.setTitle(LoginStrings.forgotPassword, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
@@ -93,7 +107,7 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return button
     }()
     
-    private let signupButton: UIButton = {
+    private lazy var signupButton: UIButton = {
         let button = UIButton()
         button.setTitle(LoginStrings.signup, for: .normal)
         button.setTitleColor(.persianBlue, for: .normal)
@@ -101,39 +115,63 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         return button
     }()
     
-    private var stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.spacing = 8
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
+    // MARK: - Initializers
+    init(interactor: LoginBusinessLogic) {
+        self.interactor = interactor
+        super.init(nibName: nil, bundle: nil)
+    }
     
-    private var buttonsStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.distribution = .equalSpacing
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    // MARK: Object lifecycle
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
-    
-    // MARK: View lifecycle
+
+    // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
         setupConstraints()
         setupActions()
     }
-    
-    private func setupViews() {
+
+    // MARK: - Actions
+    @objc private func loginTapped() {
+        let request = Login.Login.Request(
+            email: emailTextField.text ?? "",
+            password: passwordTextField.text ?? ""
+        )
+        interactor?.login(request: request)
+    }
+
+    @objc private func loginWithoutCredentialsTapped() {
+        interactor?.loginWithoutCredentials()
+    }
+
+    // MARK: - Display Logic
+    func showLoginSuccess() {
+        interactor?.routeToArticles()
+    }
+
+    func showLoginError(_ message: String) {
+        showAlert(title: LoginStrings.errorTitle, message: message)
+    }
+
+    // MARK: - Alert Helper
+    private func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(.init(title: LoginStrings.okButton, style: .default))
+        present(alert, animated: true)
+    }
+}
+
+// MARK: - Setup Views
+private extension LoginViewController {
+    func setupViews() {
+        view.backgroundColor = .white
+
         stackView.addArrangedSubview(titleLabel)
         stackView.addArrangedSubview(subtitleLabel)
         stackView.addArrangedSubview(emailLabel)
@@ -142,67 +180,34 @@ class LoginViewController: UIViewController, LoginDisplayLogic {
         stackView.addArrangedSubview(passwordTextField)
         stackView.addArrangedSubview(loginButton)
         stackView.addArrangedSubview(loginWithoutCredentialsButton)
-        
+
         buttonsStackView.addArrangedSubview(forgotPasswordButton)
         buttonsStackView.addArrangedSubview(signupButton)
         stackView.addArrangedSubview(buttonsStackView)
-        
+
         view.addSubview(stackView)
-        view.backgroundColor = .white
     }
-    
-    private func setupConstraints() {
+
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
             stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
             stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30),
             
             subtitleLabel.bottomAnchor.constraint(equalTo: emailLabel.topAnchor, constant: -32),
-            
             emailTextField.heightAnchor.constraint(equalToConstant: 44),
             emailTextField.bottomAnchor.constraint(equalTo: passwordLabel.topAnchor, constant: -20),
-            
             passwordTextField.heightAnchor.constraint(equalToConstant: 44),
             passwordTextField.bottomAnchor.constraint(equalTo: loginButton.topAnchor, constant: -40),
-            
             loginButton.heightAnchor.constraint(equalToConstant: 44),
             loginButton.bottomAnchor.constraint(equalTo: loginWithoutCredentialsButton.topAnchor, constant: -12),
-            
             loginWithoutCredentialsButton.heightAnchor.constraint(equalToConstant: 44),
-            loginWithoutCredentialsButton.bottomAnchor.constraint(equalTo: buttonsStackView.topAnchor, constant: -20),
+            loginWithoutCredentialsButton.bottomAnchor.constraint(equalTo: buttonsStackView.topAnchor, constant: -20)
         ])
     }
-    
-    private func setupActions() {
+
+    func setupActions() {
         loginButton.addTarget(self, action: #selector(loginTapped), for: .touchUpInside)
         loginWithoutCredentialsButton.addTarget(self, action: #selector(loginWithoutCredentialsTapped), for: .touchUpInside)
-    }
-    
-    @objc private func loginTapped() {
-        let request = Login.Login.Request(
-            email: emailTextField.text ?? "",
-            password: passwordTextField.text ?? ""
-        )
-        interactor?.login(request: request)
-    }
-    
-    @objc private func loginWithoutCredentialsTapped() {
-        interactor?.loginWithoutCredentials()
-    }
-    
-    func showLoginSuccess() {
-        router?.routeToArticles()
-    }
-    
-    func showLoginError(_ message: String) {
-        let alert = UIAlertController(title: LoginStrings.errorTitle, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: LoginStrings.okButton, style: .default))
-        present(alert, animated: true)
-    }
-}
-
-extension UIColor {
-    static var persianBlue: UIColor {
-        return UIColor(red: 6/255, green: 71/255, blue: 137/255, alpha: 1.0)
     }
 }

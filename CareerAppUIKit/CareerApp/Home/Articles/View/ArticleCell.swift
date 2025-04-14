@@ -100,21 +100,27 @@ class ArticleCell: UICollectionViewCell {
             dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             tagsLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor, constant: 8),
-            tagsLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor)
+            tagsLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            
         ])
     }
     
-    func configure(with article: Article) {
+    func configure(with article: Articles.FetchArticles.ViewModel.DisplayedArticle?, currentPage: Int = 0, totalPages: Int = 0) {
+        guard let article else {
+            return
+        }
+        
         titleLabel.text = article.title
         descriptionLabel.text = article.description
-        authorLabel.text = "by \(article.user.name)"
-        dateLabel.text = article.readablePublishDate
+        authorLabel.text = "by \(article.authorName)"
+        dateLabel.text = article.publishDate
         tagsLabel.text = article.tags
         
-        if let imageUrl = article.coverImage, let url = URL(string: imageUrl) {
+        if let imageUrl = article.imageUrl, let url = URL(string: imageUrl) {
             loadImage(from: url)
         }
     }
+    
     
     private func loadImage(from url: URL) {
         URLSession.shared.dataTask(with: url) { [weak self] data, _, error in

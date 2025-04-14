@@ -7,6 +7,12 @@
 
 import UIKit
 
+protocol ArticlesDisplayLogic: AnyObject {
+    func displayArticlesEmpty()
+    func displayArticles(_ articles: Articles.FetchArticles.ViewModel)
+    func displayError(_ error: String)
+}
+
 class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     var interactor: ArticlesBusinessLogic?
     var router: (NSObjectProtocol & ArticlesRoutingLogic & ArticlesDataStore)?
@@ -24,15 +30,8 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(ArticleCell.self, forCellWithReuseIdentifier: ArticleCell.identifier)
+        collectionView.register(EmptyArticlesCell.self, forCellWithReuseIdentifier: EmptyArticlesCell.identifier)
         return collectionView
-    }()
-    
-    private lazy var pageControl: UIPageControl = {
-        let pageControl = UIPageControl()
-        pageControl.currentPageIndicatorTintColor = .persianBlue
-        pageControl.pageIndicatorTintColor = .lightGray
-        pageControl.translatesAutoresizingMaskIntoConstraints = false
-        return pageControl
     }()
     
     private lazy var activityIndicator: UIActivityIndicatorView = {
@@ -43,8 +42,16 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         return indicator
     }()
     
+    private lazy var pageControl: UIPageControl = {
+        let pageControl = UIPageControl()
+        pageControl.currentPageIndicatorTintColor = .persianBlue
+        pageControl.pageIndicatorTintColor = .lightGray
+        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        return pageControl
+    }()
+    
     // MARK: - Properties
-    private var articles: [Article] = []
+    private var articles: Articles.FetchArticles.ViewModel?
     
     // MARK: - Initialization
     init(interactor: ArticlesBusinessLogic) {
@@ -80,7 +87,6 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -240),
             
-            // Alteração aqui - agora referenciando o bottom da collectionView
             pageControl.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
             pageControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
@@ -94,7 +100,6 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         title = "Artigos"
         navigationController?.navigationBar.prefersLargeTitles = false
         
-        // Opcional: personalizar a aparência da navigation bar
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .systemBackground
@@ -110,17 +115,25 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.startAnimating()
         }
-        let request = Articles.FetchArticles.Request()
-        interactor?.fetchArticles(request: request)
+        interactor?.fetchArticles()
     }
     
     // MARK: - ArticlesDisplayLogic
-    func displayArticles(_ articles: [Article]) {
+    func displayArticlesEmpty() {
+        DispatchQueue.main.async { [weak self] in
+            self?.activityIndicator.stopAnimating()
+            self?.articles = nil
+            self?.collectionView.reloadData()
+            self?.pageControl.isHidden = true
+        }
+    }
+    
+    func displayArticles(_ articles: Articles.FetchArticles.ViewModel) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
             self?.articles = articles
             self?.collectionView.reloadData()
-            self?.pageControl.numberOfPages = articles.count
+            self?.pageControl.numberOfPages = articles.displayedArticles.count
         }
     }
     
@@ -137,18 +150,19 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
 // MARK: - UICollectionViewDataSource
 extension ArticlesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return articles.isEmpty ? 1 : articles.count
+        guard let displayedArticles = articles?.displayedArticles else { return 1 }
+        return displayedArticles.isEmpty ? 1 : displayedArticles.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as! ArticleCell
-        
-        if articles.isEmpty {
-            //            cell.configureAsLoading()
-        } else {
-            cell.configure(with: articles[indexPath.item])
+        guard let articles = articles else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmptyArticlesCell.identifier, for: indexPath) as! EmptyArticlesCell
+            cell.configureEmptyView()
+            return cell
         }
         
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as! ArticleCell
+        cell.configure(with: articles.displayedArticles[indexPath.item])
         return cell
     }
 }
