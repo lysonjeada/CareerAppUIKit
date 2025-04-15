@@ -11,6 +11,8 @@ protocol ArticlesDisplayLogic: AnyObject {
     func displayArticlesEmpty()
     func displayArticles(_ articles: Articles.FetchArticles.ViewModel)
     func displayError(_ error: String)
+    func displayLoading(_ isLoading: Bool)
+    func displayArticleDetail(_ articleDetail: ArticleDetail)
 }
 
 class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
@@ -119,6 +121,21 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     }
     
     // MARK: - ArticlesDisplayLogic
+    func displayLoading(_ isLoading: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            if isLoading {
+                self?.activityIndicator.startAnimating()
+                self?.collectionView.isHidden = true
+                self?.pageControl.isHidden = true
+                self?.collectionView.isHidden = true
+            } else {
+                self?.activityIndicator.stopAnimating()
+                self?.collectionView.isHidden = false
+                self?.pageControl.isHidden = false
+            }
+        }
+    }
+    
     func displayArticlesEmpty() {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
@@ -144,6 +161,11 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             self?.present(alert, animated: true)
         }
+    }
+    
+    func displayArticleDetail(_ articleDetail: ArticleDetail) {
+        router?.articleDetail = articleDetail
+        router?.routeToArticleDetail(id: articleDetail.id ?? 0)
     }
 }
 
@@ -176,5 +198,12 @@ extension ArticlesViewController: UICollectionViewDelegateFlowLayout {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
+    }
+}
+
+extension ArticlesViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let article = articles?.displayedArticles[indexPath.item] else { return }
+        interactor?.didSelectArticle(id: article.id)
     }
 }

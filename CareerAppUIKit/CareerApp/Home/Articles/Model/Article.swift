@@ -39,6 +39,7 @@ enum Articles {
     struct FetchArticles {
         struct ViewModel {
             struct DisplayedArticle {
+                let id: Int
                 let title: String
                 let description: String
                 let publishDate: String

@@ -58,6 +58,9 @@ class ArticleCell: UICollectionViewCell {
         let label = UILabel()
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .persianBlue
+        label.numberOfLines = 0 // Permite infinitas linhas
+        label.lineBreakMode = .byWordWrapping // Quebra por palavras
+        label.textAlignment = .center // Mantém o texto centralizado
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -81,8 +84,9 @@ class ArticleCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 32),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -32),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            imageView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: 16),
             imageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.4),
             
             titleLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
@@ -100,8 +104,9 @@ class ArticleCell: UICollectionViewCell {
             dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             tagsLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor, constant: 8),
-            tagsLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            
+            tagsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            tagsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            tagsLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -16)
         ])
     }
     

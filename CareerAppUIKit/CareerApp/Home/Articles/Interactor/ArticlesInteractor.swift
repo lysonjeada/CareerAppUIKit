@@ -9,6 +9,7 @@
 
 protocol ArticlesBusinessLogic {
     func fetchArticles()
+    func didSelectArticle(id: Int)
 }
 
 // MARK: - Interactor
@@ -16,6 +17,7 @@ protocol ArticlesBusinessLogic {
 class ArticlesInteractor: ArticlesBusinessLogic {
     var presenter: ArticlesPresentationLogic?
     var worker: ArticlesWorkerProtocol?
+    var router: ArticlesRoutingLogic?
     
     init(presenter: ArticlesPresentationLogic?, worker: ArticlesWorkerProtocol?) {
         self.presenter = presenter
@@ -23,14 +25,21 @@ class ArticlesInteractor: ArticlesBusinessLogic {
     }
     
     func fetchArticles() {
-        self.presenter?.presentArticles(articles: [])
-//        worker?.fetchArticles { [weak self] result in
-//            switch result {
-//            case .success(let articles):
-//                self?.presenter?.presentArticles(articles: articles)
-//            case .failure(let error):
-//                self?.presenter?.presentError(error: error)
-//            }
-//        }
+        presenter?.presentLoading(true)
+        worker?.fetchArticles { [weak self] result in
+            switch result {
+            case .success(let articles):
+                self?.presenter?.presentLoading(false)
+                self?.presenter?.presentArticles(articles: articles)
+            case .failure(let error):
+                self?.presenter?.presentLoading(false)
+                self?.presenter?.presentError(error: error)
+            }
+        }
+    }
+    
+    func didSelectArticle(id: Int) {
+        router?.selectedArticleId = id
+        router?.routeToArticleDetail(id: id)
     }
 }

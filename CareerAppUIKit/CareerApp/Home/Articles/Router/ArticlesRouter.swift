@@ -10,18 +10,29 @@ import Foundation
 // MARK: - Router
 
 protocol ArticlesRoutingLogic {
-    // Potencial navegação para detalhes do artigo
+    var selectedArticleId: Int? { get set }
+    var articleDetail: ArticleDetail? { get set }
+    func routeToArticleDetail(id: Int)
 }
 
 protocol ArticlesDataStore {
-    var articles: [Article]? { get set }
+    var selectedArticleId: Int? { get set }
+    var articleDetail: ArticleDetail? { get set }
 }
 
 class ArticlesRouter: NSObject, ArticlesRoutingLogic, ArticlesDataStore {
-    var articles: [Article]?
-    
     weak var viewController: ArticlesViewController?
-    var dataStore: ArticlesDataStore?
+    var selectedArticleId: Int?
+    var articleDetail: ArticleDetail?
     
-    // Implementar navegação se necessário
+    func routeToArticleDetail(id: Int) {
+        let detailVC = ArticleDetailViewController(id: id)
+        let presenter = ArticleDetailPresenter()
+        let worker = ArticleDetailWorker()
+        detailVC.interactor = ArticleDetailInteractor(presenter: presenter, worker: worker)
+        
+        presenter.viewController = detailVC
+//        detailVC.router?.dataStore?.articleDetail = articleDetail
+        viewController?.navigationController?.pushViewController(detailVC, animated: true)
+    }
 }
