@@ -8,7 +8,6 @@
 import UIKit
 
 protocol ArticlesDisplayLogic: AnyObject {
-    func displayArticlesEmpty()
     func displayArticles(_ articles: Articles.FetchArticles.ViewModel)
     func displayError(_ error: String)
     func displayLoading(_ isLoading: Bool)
@@ -99,13 +98,21 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     }
     
     private func setupNavigationBar() {
-        title = "Artigos"
+        title = HomeStrings.articlesTitle
         navigationController?.navigationBar.prefersLargeTitles = false
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = .systemBackground
         appearance.titleTextAttributes = [.foregroundColor: UIColor.persianBlue]
+        
+        let backButton = UIBarButtonItem(image: UIImage(systemName: "xmark"),
+                                        style: .plain,
+                                        target: self,
+                                        action: #selector(backButtonTapped))
+        backButton.tintColor = .persianBlue
+        navigationItem.leftBarButtonItem = backButton
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         
         navigationController?.navigationBar.standardAppearance = appearance
         navigationController?.navigationBar.scrollEdgeAppearance = appearance
@@ -136,7 +143,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         }
     }
     
-    func displayArticlesEmpty() {
+    private func displayArticlesEmpty() {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
             self?.articles = nil
@@ -145,7 +152,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         }
     }
     
-    func displayArticles(_ articles: Articles.FetchArticles.ViewModel) {
+    private func displayArticlesList(_ articles: Articles.FetchArticles.ViewModel) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
             self?.articles = articles
@@ -154,18 +161,29 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         }
     }
     
+    func displayArticles(_ articles: Articles.FetchArticles.ViewModel) {
+        if articles.displayedArticles.isEmpty {
+            displayArticlesEmpty()
+        } else {
+            displayArticlesList(articles)
+        }
+    }
+    
     func displayError(_ error: String) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
-            let alert = UIAlertController(title: "Error", message: error, preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            let alert = UIAlertController(title: HomeStrings.errorMessage, message: error, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: HomeStrings.errorButton, style: .default))
             self?.present(alert, animated: true)
         }
     }
     
     func displayArticleDetail(_ articleDetail: ArticleDetail) {
-        router?.articleDetail = articleDetail
         router?.routeToArticleDetail(id: articleDetail.id ?? 0)
+    }
+    
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
 }
 

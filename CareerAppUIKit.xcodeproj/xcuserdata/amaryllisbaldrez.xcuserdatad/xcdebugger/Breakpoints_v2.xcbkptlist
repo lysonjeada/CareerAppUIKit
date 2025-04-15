@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7A964523-BDE6-43CB-85D1-D256B18354C7"
+            uuid = "CCDE2B9C-90B6-40A2-AEAD-D88EEFF72975"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "CareerAppUIKit/CareerApp/Home/Articles/Router/ArticlesRouter.swift"
+            filePath = "CareerAppUIKit/CareerApp/Home/Articles/View/ArticlesViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "36"
-            endingLineNumber = "36"
-            landmarkName = "routeToArticleDetail(id:)"
+            startingLineNumber = "165"
+            endingLineNumber = "165"
+            landmarkName = "displayArticles(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

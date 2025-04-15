@@ -20,8 +20,6 @@ class LoginRouter: NSObject, LoginRoutingLogic, LoginDataStore {
     
     func routeToArticles() {
         let viewController = ArticlesFactory.build()
-        let articlesNavigationController = UINavigationController(rootViewController: viewController)
-        articlesNavigationController.modalPresentationStyle = .fullScreen
-        loginViewController?.present(articlesNavigationController, animated: true)
+        loginViewController?.navigationController?.pushViewController(viewController, animated: true)
     }
 }

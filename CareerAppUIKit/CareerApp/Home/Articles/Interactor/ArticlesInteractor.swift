@@ -5,6 +5,8 @@
 //  Created by Amaryllis Baldrez on 04/04/25.
 //
 
+import Foundation
+
 // MARK: - Protocols
 
 protocol ArticlesBusinessLogic {
@@ -29,17 +31,16 @@ class ArticlesInteractor: ArticlesBusinessLogic {
         worker?.fetchArticles { [weak self] result in
             switch result {
             case .success(let articles):
-                self?.presenter?.presentLoading(false)
                 self?.presenter?.presentArticles(articles: articles)
-            case .failure(let error):
                 self?.presenter?.presentLoading(false)
+            case .failure(let error):
                 self?.presenter?.presentError(error: error)
+                self?.presenter?.presentLoading(false)
             }
         }
     }
     
     func didSelectArticle(id: Int) {
-        router?.selectedArticleId = id
         router?.routeToArticleDetail(id: id)
     }
 }

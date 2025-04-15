@@ -26,3 +26,7 @@
 // Alertas
 "login.error.title" = "Erro";
 "login.error.ok_button" = "OK";
+
+"home.articles.title" = "Artigos";
+"home.articles.error.message" = "Erro ao carregar artigos";
+"home.articles.error.button" = "Concluir";
