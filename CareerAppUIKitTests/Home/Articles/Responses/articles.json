@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "title": "Getting Started with SwiftUI",
+    "description": "Learn the basics of SwiftUI in this comprehensive tutorial",
+    "readable_publish_date": "May 15, 2023",
+    "url": "https://example.com/swiftui-tutorial",
+    "cover_image": "https://example.com/images/swiftui.jpg",
+    "tags": "swift, ios, swiftui",
+    "user": {
+      "name": "John Appleseed",
+      "username": "jappleseed",
+      "profile_image": "https://example.com/profiles/jappleseed.jpg"
+    }
+  },
+  {
+    "id": 2,
+    "title": "Advanced Combine Techniques",
+    "description": "Master reactive programming with Combine framework",
+    "readable_publish_date": "June 2, 2023",
+    "url": "https://example.com/combine-techniques",
+    "cover_image": null,
+    "tags": "combine, swift, reactive",
+    "user": {
+      "name": "Jane Developer",
+      "username": "jdev",
+      "profile_image": "https://example.com/profiles/jdev.jpg"
+    }
+  }
+]

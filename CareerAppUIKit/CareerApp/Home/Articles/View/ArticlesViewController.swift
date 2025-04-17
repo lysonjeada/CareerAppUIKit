@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ArticlesDisplayLogic: AnyObject {
+    var articles: Articles.FetchArticles.ViewModel? { get }
     func displayArticles(_ articles: Articles.FetchArticles.ViewModel)
     func displayError(_ error: String)
     func displayLoading(_ isLoading: Bool)
@@ -52,7 +53,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     }()
     
     // MARK: - Properties
-    private var articles: Articles.FetchArticles.ViewModel?
+    var articles: Articles.FetchArticles.ViewModel?
     
     // MARK: - Initialization
     init(interactor: ArticlesBusinessLogic) {
