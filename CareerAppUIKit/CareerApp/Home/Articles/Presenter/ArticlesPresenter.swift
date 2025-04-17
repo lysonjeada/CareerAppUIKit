@@ -6,9 +6,9 @@
 //
 
 protocol ArticlesPresentationLogic {
-    func presentArticles(articles: [Article])
-    func presentError(error: Error)
-    func presentLoading(_ isLoading: Bool)
+    func presentArticles(response: Articles.FetchArticles.Response)
+    func presentError(response: Articles.PresentError.Response)
+    func presentLoading(response: Articles.PresentLoading.Response)
 }
 
 // MARK: - Presenter
@@ -16,13 +16,13 @@ protocol ArticlesPresentationLogic {
 class ArticlesPresenter: ArticlesPresentationLogic {
     weak var viewController: ArticlesDisplayLogic?
     
-    func presentLoading(_ isLoading: Bool) {
-        viewController?.displayLoading(isLoading)
+    func presentLoading(response: Articles.PresentLoading.Response) {
+        viewController?.displayLoading(viewModel: response)
     }
     
-    func presentArticles(articles: [Article]) {
-        let displayedArticles = articles.map { article in
-            Articles.FetchArticles.ViewModel.DisplayedArticle(
+    func presentArticles(response: Articles.FetchArticles.Response) {
+        let displayedArticles = response.articles.map { article in
+            DisplayedArticle(
                 id: article.id,
                 title: article.title,
                 description: article.description,
@@ -33,10 +33,10 @@ class ArticlesPresenter: ArticlesPresentationLogic {
             )
         }
         let viewModel = Articles.FetchArticles.ViewModel(displayedArticles: displayedArticles)
-        viewController?.displayArticles(viewModel)
+        viewController?.displayArticles(viewModel: viewModel)
     }
     
-    func presentError(error: Error) {
-        viewController?.displayError(error.localizedDescription)
+    func presentError(response: Articles.PresentError.Response) {
+        viewController?.displayError(viewModel: response)
     }
 }

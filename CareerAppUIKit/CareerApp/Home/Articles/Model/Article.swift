@@ -36,19 +36,57 @@ struct User: Codable {
 }
 
 enum Articles {
+    struct DidSelectArticle {
+        struct Request {
+            let id: Int
+        }
+        
+        struct Response {
+            let articles: [Article]
+        }
+    }
+    
+    struct ArticleDetail {
+        struct Request {
+            let articleId: Int
+        }
+    }
+    
     struct FetchArticles {
+        struct Request {}
+        
+        struct Response {
+            let articles: [Article]
+        }
+        
         struct ViewModel {
-            struct DisplayedArticle {
-                let id: Int
-                let title: String
-                let description: String
-                let publishDate: String
-                let imageUrl: String?
-                let authorName: String
-                let tags: String
-            }
-            
             let displayedArticles: [DisplayedArticle]
         }
     }
+    
+    struct PresentError {
+        struct Request {}
+        
+        struct Response {
+            let errorMessage: String
+        }
+    }
+    
+    struct PresentLoading {
+        struct Request {}
+        
+        struct Response {
+            let isLoading: Bool
+        }
+    }
+}
+
+struct DisplayedArticle {
+    let id: Int
+    let title: String
+    let description: String
+    let publishDate: String
+    let imageUrl: String?
+    let authorName: String
+    let tags: String
 }

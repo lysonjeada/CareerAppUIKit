@@ -8,10 +8,10 @@
 import UIKit
 
 protocol ArticlesDisplayLogic: AnyObject {
-    var articles: Articles.FetchArticles.ViewModel? { get }
-    func displayArticles(_ articles: Articles.FetchArticles.ViewModel)
-    func displayError(_ error: String)
-    func displayLoading(_ isLoading: Bool)
+    //    var articles: Articles.FetchArticles.ViewModel? { get }
+    func displayArticles(viewModel: Articles.FetchArticles.ViewModel)
+    func displayError(viewModel: Articles.PresentError.Response)
+    func displayLoading(viewModel: Articles.PresentLoading.Response)
     func displayArticleDetail(_ articleDetail: ArticleDetail)
 }
 
@@ -53,7 +53,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     }()
     
     // MARK: - Properties
-    var articles: Articles.FetchArticles.ViewModel?
+    private var displayedArticles: [DisplayedArticle] = []
     
     // MARK: - Initialization
     init(interactor: ArticlesBusinessLogic) {
@@ -108,9 +108,9 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         appearance.titleTextAttributes = [.foregroundColor: UIColor.persianBlue]
         
         let backButton = UIBarButtonItem(image: UIImage(systemName: "xmark"),
-                                        style: .plain,
-                                        target: self,
-                                        action: #selector(backButtonTapped))
+                                         style: .plain,
+                                         target: self,
+                                         action: #selector(backButtonTapped))
         backButton.tintColor = .persianBlue
         navigationItem.leftBarButtonItem = backButton
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
@@ -122,10 +122,8 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     
     // MARK: - Data Loading
     private func loadArticles() {
-        DispatchQueue.main.async { [weak self] in
-            self?.activityIndicator.startAnimating()
-        }
-        interactor?.fetchArticles()
+        let request = Articles.FetchArticles.Request()
+        interactor?.fetchArticles(request: request)
     }
     
     // MARK: - ArticlesDisplayLogic
@@ -144,38 +142,44 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         }
     }
     
-    private func displayArticlesEmpty() {
+    func displayArticles(viewModel: Articles.FetchArticles.ViewModel) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
-            self?.articles = nil
+            self?.displayedArticles = viewModel.displayedArticles
             self?.collectionView.reloadData()
-            self?.pageControl.isHidden = true
+            
+            if viewModel.displayedArticles.isEmpty {
+                self?.pageControl.isHidden = true
+            } else {
+                self?.pageControl.numberOfPages = viewModel.displayedArticles.count
+                self?.pageControl.isHidden = false
+                self?.collectionView.isHidden = false
+            }
         }
     }
     
-    private func displayArticlesList(_ articles: Articles.FetchArticles.ViewModel) {
+    func displayError(viewModel: Articles.PresentError.Response) {
         DispatchQueue.main.async { [weak self] in
             self?.activityIndicator.stopAnimating()
-            self?.articles = articles
-            self?.collectionView.reloadData()
-            self?.pageControl.numberOfPages = articles.displayedArticles.count
-        }
-    }
-    
-    func displayArticles(_ articles: Articles.FetchArticles.ViewModel) {
-        if articles.displayedArticles.isEmpty {
-            displayArticlesEmpty()
-        } else {
-            displayArticlesList(articles)
-        }
-    }
-    
-    func displayError(_ error: String) {
-        DispatchQueue.main.async { [weak self] in
-            self?.activityIndicator.stopAnimating()
-            let alert = UIAlertController(title: HomeStrings.errorMessage, message: error, preferredStyle: .alert)
+            let alert = UIAlertController(title: HomeStrings.errorMessage,
+                                          message: viewModel.errorMessage,
+                                          preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: HomeStrings.errorButton, style: .default))
             self?.present(alert, animated: true)
+        }
+    }
+    
+    func displayLoading(viewModel: Articles.PresentLoading.Response) {
+        DispatchQueue.main.async { [weak self] in
+            if viewModel.isLoading {
+                self?.activityIndicator.startAnimating()
+                self?.collectionView.isHidden = true
+                self?.pageControl.isHidden = true
+            } else {
+                self?.activityIndicator.stopAnimating()
+                self?.collectionView.isHidden = false
+                self?.pageControl.isHidden = false
+            }
         }
     }
     
@@ -191,19 +195,22 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
 // MARK: - UICollectionViewDataSource
 extension ArticlesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        guard let displayedArticles = articles?.displayedArticles else { return 1 }
         return displayedArticles.isEmpty ? 1 : displayedArticles.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let articles = articles else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmptyArticlesCell.identifier, for: indexPath) as! EmptyArticlesCell
-            cell.configureEmptyView()
-            return cell
-        }
+        if displayedArticles.isEmpty {
+                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmptyArticlesCell.identifier, for: indexPath) as? EmptyArticlesCell else {
+                    fatalError("Unable to dequeue EmptyArticlesCell")
+                }
+                cell.configureEmptyView()
+                return cell
+            }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as! ArticleCell
-        cell.configure(with: articles.displayedArticles[indexPath.item])
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as? ArticleCell else {
+                fatalError("Unable to dequeue cell")
+            }
+        cell.configure(with: displayedArticles[indexPath.item])
         return cell
     }
 }
@@ -220,9 +227,11 @@ extension ArticlesViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UICollectionViewDelegate
 extension ArticlesViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let article = articles?.displayedArticles[indexPath.item] else { return }
-        interactor?.didSelectArticle(id: article.id)
+        guard !displayedArticles.isEmpty else { return }
+        let request = Articles.DidSelectArticle.Request(id: displayedArticles[indexPath.item].id)
+        interactor?.didSelectArticle(request: request)
     }
 }

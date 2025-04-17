@@ -110,7 +110,7 @@ class ArticleCell: UICollectionViewCell {
         ])
     }
     
-    func configure(with article: Articles.FetchArticles.ViewModel.DisplayedArticle?, currentPage: Int = 0, totalPages: Int = 0) {
+    func configure(with article: DisplayedArticle?, currentPage: Int = 0, totalPages: Int = 0) {
         guard let article else {
             return
         }
