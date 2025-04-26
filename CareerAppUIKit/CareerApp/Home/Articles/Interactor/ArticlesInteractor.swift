@@ -12,7 +12,6 @@ import Foundation
 protocol ArticlesBusinessLogic {
     func fetchArticles(request: Articles.FetchArticles.Request)
     func didSelectArticle(request: Articles.DidSelectArticle.Request)
-    func goToSwiftUIView()
 }
 
 // MARK: - Interactor
@@ -43,9 +42,5 @@ class ArticlesInteractor: ArticlesBusinessLogic {
     
     func didSelectArticle(request: Articles.DidSelectArticle.Request) {
         router.routeToArticleDetail(id: request.id)
-    }
-    
-    func goToSwiftUIView() {
-        router.goToSwiftUIView()
     }
 }

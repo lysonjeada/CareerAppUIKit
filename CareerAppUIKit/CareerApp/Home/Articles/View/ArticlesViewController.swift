@@ -57,17 +57,6 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         return pageControl
     }()
     
-    private lazy var swiftUIButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Ir para a tela de SwiftUI", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(goToSwiftUI), for: .touchUpInside)
-        return button
-    }()
-    
     // MARK: - Properties
     
     
@@ -97,7 +86,6 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         view.addSubview(collectionView)
         view.addSubview(pageControl)
         view.addSubview(activityIndicator)
-        view.addSubview(swiftUIButton)
     }
     
     private func setupConstraints() {
@@ -105,19 +93,14 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            collectionView.bottomAnchor.constraint(equalTo: swiftUIButton.topAnchor, constant: -32),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -320),
             
             pageControl.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
             pageControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            
-            swiftUIButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            swiftUIButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            swiftUIButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            swiftUIButton.heightAnchor.constraint(equalToConstant: 50)
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
@@ -213,10 +196,6 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     
     @objc private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
-    }
-    
-    @objc private func goToSwiftUI() {
-        interactor?.goToSwiftUIView()
     }
 }
 

@@ -39,17 +39,18 @@ class ArticlesInteractorTests: XCTestCase {
 class ArticlesPresenterSpy: ArticlesPresentationLogic {
     var presentArticlesCalled = false
     var presentErrorCalled = false
+    var presentLoadingCalled = false
     
     func presentArticles(response: CareerAppUIKit.Articles.FetchArticles.Response) {
-        
+        presentArticlesCalled = true
     }
     
     func presentError(response: CareerAppUIKit.Articles.PresentError.Response) {
-        
+        presentErrorCalled = true
     }
     
     func presentLoading(response: CareerAppUIKit.Articles.PresentLoading.Response) {
-        
+        presentLoadingCalled = true
     }
 }
 

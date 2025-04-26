@@ -78,17 +78,7 @@ class ArticlesViewSpy: ArticlesDisplayLogic {
         displayArticlesCalled = true
     }
     
-    func displayError(_ error: String) {
-        
-    }
-    
-    func displayLoading(_ isLoading: Bool) {
-        
-    }
-    
     func displayArticleDetail(_ articleDetail: CareerAppUIKit.ArticleDetail) {
         
     }
-    
-    
 }
