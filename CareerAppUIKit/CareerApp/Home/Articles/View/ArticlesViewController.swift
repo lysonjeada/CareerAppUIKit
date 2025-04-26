@@ -17,7 +17,12 @@ protocol ArticlesDisplayLogic: AnyObject {
 
 class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     var interactor: ArticlesBusinessLogic?
-    var router: (NSObjectProtocol & ArticlesRoutingLogic & ArticlesDataStore)?
+    private let dataStore: ArticlesDataStoreProtocol
+    
+    private var displayedArticles: [DisplayedArticle] {
+        get { dataStore.displayedArticles }
+        set { dataStore.displayedArticles = newValue }
+    }
     
     // MARK: - UI Components
     private lazy var collectionView: UICollectionView = {
@@ -52,12 +57,24 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         return pageControl
     }()
     
+    private lazy var swiftUIButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Ir para a tela de SwiftUI", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 8
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(goToSwiftUI), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - Properties
-    private var displayedArticles: [DisplayedArticle] = []
+    
     
     // MARK: - Initialization
-    init(interactor: ArticlesBusinessLogic) {
+    init(interactor: ArticlesBusinessLogic, dataStore: ArticlesDataStoreProtocol = ArticlesDataStore()) {
         self.interactor = interactor
+        self.dataStore = dataStore
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -80,6 +97,7 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
         view.addSubview(collectionView)
         view.addSubview(pageControl)
         view.addSubview(activityIndicator)
+        view.addSubview(swiftUIButton)
     }
     
     private func setupConstraints() {
@@ -87,14 +105,19 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -240),
+            collectionView.bottomAnchor.constraint(equalTo: swiftUIButton.topAnchor, constant: -32),
             
             pageControl.bottomAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 16),
             pageControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             pageControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
             activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            
+            swiftUIButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            swiftUIButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            swiftUIButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            swiftUIButton.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -184,11 +207,16 @@ class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     }
     
     func displayArticleDetail(_ articleDetail: ArticleDetail) {
-        router?.routeToArticleDetail(id: articleDetail.id ?? 0)
+        guard let id = articleDetail.id else { return }
+        interactor?.didSelectArticle(request: .init(id: id))
     }
     
     @objc private func backButtonTapped() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    @objc private func goToSwiftUI() {
+        interactor?.goToSwiftUIView()
     }
 }
 
@@ -200,16 +228,16 @@ extension ArticlesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if displayedArticles.isEmpty {
-                guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmptyArticlesCell.identifier, for: indexPath) as? EmptyArticlesCell else {
-                    fatalError("Unable to dequeue EmptyArticlesCell")
-                }
-                cell.configureEmptyView()
-                return cell
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: EmptyArticlesCell.identifier, for: indexPath) as? EmptyArticlesCell else {
+                fatalError("Unable to dequeue EmptyArticlesCell")
             }
+            cell.configureEmptyView()
+            return cell
+        }
         
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ArticleCell.identifier, for: indexPath) as? ArticleCell else {
-                fatalError("Unable to dequeue cell")
-            }
+            fatalError("Unable to dequeue cell")
+        }
         cell.configure(with: displayedArticles[indexPath.item])
         return cell
     }

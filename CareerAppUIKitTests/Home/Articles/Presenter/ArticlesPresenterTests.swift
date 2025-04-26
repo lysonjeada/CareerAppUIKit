@@ -30,7 +30,7 @@ class ArticlesPresenterTests: XCTestCase {
         let articles = loadArticlesFromJSON()
         
         // When
-        presenter.presentArticles(articles: articles)
+        presenter.presentArticles(response: .init(articles: articles))
         
         // Then
         XCTAssertTrue(view.displayArticlesCalled)
@@ -60,13 +60,21 @@ class ArticlesPresenterTests: XCTestCase {
 }
 
 class ArticlesViewSpy: ArticlesDisplayLogic {
+    
     var articles: Articles.FetchArticles.ViewModel?
     
     var displayArticlesCalled = false
     var displayErrorCalled = false
     
-    func displayArticles(_ articles: CareerAppUIKit.Articles.FetchArticles.ViewModel) {
-        self.articles = articles
+    func displayError(viewModel: CareerAppUIKit.Articles.PresentError.Response) {
+        
+    }
+    
+    func displayLoading(viewModel: CareerAppUIKit.Articles.PresentLoading.Response) {
+        
+    }
+    
+    func displayArticles(viewModel: CareerAppUIKit.Articles.FetchArticles.ViewModel) {
         displayArticlesCalled = true
     }
     

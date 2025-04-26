@@ -36,22 +36,6 @@ struct User: Codable {
 }
 
 enum Articles {
-    struct DidSelectArticle {
-        struct Request {
-            let id: Int
-        }
-        
-        struct Response {
-            let articles: [Article]
-        }
-    }
-    
-    struct ArticleDetail {
-        struct Request {
-            let articleId: Int
-        }
-    }
-    
     struct FetchArticles {
         struct Request {}
         
@@ -77,6 +61,22 @@ enum Articles {
         
         struct Response {
             let isLoading: Bool
+        }
+    }
+    
+    struct DidSelectArticle {
+        struct Request {
+            let id: Int
+        }
+        
+        struct Response {
+            let articles: [Article]
+        }
+    }
+    
+    struct ArticleDetail {
+        struct Request {
+            let articleId: Int
         }
     }
 }

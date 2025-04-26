@@ -17,7 +17,7 @@ class ArticlesPresenter: ArticlesPresentationLogic {
     weak var viewController: ArticlesDisplayLogic?
     
     func presentLoading(response: Articles.PresentLoading.Response) {
-        viewController?.displayLoading(viewModel: response)
+        viewController?.displayLoading(viewModel: .init(isLoading: response.isLoading))
     }
     
     func presentArticles(response: Articles.FetchArticles.Response) {
@@ -37,6 +37,6 @@ class ArticlesPresenter: ArticlesPresentationLogic {
     }
     
     func presentError(response: Articles.PresentError.Response) {
-        viewController?.displayError(viewModel: response)
+        viewController?.displayError(viewModel: .init(errorMessage: response.errorMessage))
     }
 }

@@ -18,7 +18,7 @@ class ArticlesInteractorTests: XCTestCase {
         super.setUp()
         presenter = .init()
         worker = .init()
-        interactor = .init(presenter: presenter, worker: worker)
+        interactor = .init(presenter: presenter, worker: worker, router: ArticlesRouterSpy())
     }
     
     override func tearDown() {
@@ -29,7 +29,7 @@ class ArticlesInteractorTests: XCTestCase {
     func testWhenArticlesFetchSuccessfully() {
         worker.isSuccess = true
         
-        interactor.fetchArticles()
+        interactor.fetchArticles(request: .init())
         
         XCTAssertTrue(presenter.presentArticlesCalled)
     }
@@ -40,15 +40,15 @@ class ArticlesPresenterSpy: ArticlesPresentationLogic {
     var presentArticlesCalled = false
     var presentErrorCalled = false
     
-    func presentArticles(articles: [CareerAppUIKit.Article]) {
-        presentArticlesCalled = true
-    }
-    
-    func presentLoading(_ isLoading: Bool) {
+    func presentArticles(response: CareerAppUIKit.Articles.FetchArticles.Response) {
         
     }
     
-    func presentError(error: Error) {
+    func presentError(response: CareerAppUIKit.Articles.PresentError.Response) {
+        
+    }
+    
+    func presentLoading(response: CareerAppUIKit.Articles.PresentLoading.Response) {
         
     }
 }
@@ -66,6 +66,13 @@ class ArticlesWorkerSpy: ArticlesWorkerProtocol {
     }
     
 }
+
+class ArticlesRouterSpy: ArticlesRoutingLogic {
+    func routeToArticleDetail(id: Int) {
+        
+    }
+}
+
 
 enum NetworkError: Error {
     case invalidURL
