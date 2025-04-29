@@ -8,75 +8,103 @@
 import XCTest
 @testable import CareerAppUIKit
 
-class ArticlesInteractorTests: XCTestCase {
+final class ArticlesInteractorTests: XCTestCase {
     
-    var interactor: ArticlesInteractor!
-    var presenter: ArticlesPresenterSpy!
-    var worker: ArticlesWorkerSpy!
+    // MARK: - Properties
+    private var interactor: ArticlesInteractor?
+    private var presenter: ArticlesPresenterSpy?
+    private var worker: ArticlesWorkerSpy?
+    private var router: ArticlesRouterSpy?
     
+    // MARK: - Test Lifecycle
     override func setUp() {
         super.setUp()
-        presenter = .init()
-        worker = .init()
-        interactor = .init(presenter: presenter, worker: worker, router: ArticlesRouterSpy())
+        setupTestComponents()
     }
     
     override func tearDown() {
-        interactor = nil
+        cleanUpTestComponents()
         super.tearDown()
     }
     
-    func testWhenArticlesFetchSuccessfully() {
-        worker.isSuccess = true
-        
-        interactor.fetchArticles(request: .init())
-        
-        XCTAssertTrue(presenter.presentArticlesCalled)
-    }
+    // MARK: - Test Cases
     
-}
-
-class ArticlesPresenterSpy: ArticlesPresentationLogic {
-    var presentArticlesCalled = false
-    var presentErrorCalled = false
-    var presentLoadingCalled = false
-    
-    func presentArticles(response: CareerAppUIKit.Articles.FetchArticles.Response) {
-        presentArticlesCalled = true
-    }
-    
-    func presentError(response: CareerAppUIKit.Articles.PresentError.Response) {
-        presentErrorCalled = true
-    }
-    
-    func presentLoading(response: CareerAppUIKit.Articles.PresentLoading.Response) {
-        presentLoadingCalled = true
-    }
-}
-
-class ArticlesWorkerSpy: ArticlesWorkerProtocol {
-    
-    var isSuccess = false
-    
-    func fetchArticles(completion: @escaping (Result<[CareerAppUIKit.Article], any Error>) -> Void) {
-        if isSuccess {
-            completion(.success([]))
-        } else {
-            completion(.failure(NetworkError.decodingError))
+    func test_givenSuccessfulResponse_whenFetchingArticles_shouldPresentArticles() {
+        // Given
+        guard let worker = worker, let presenter = presenter else {
+            return XCTFail("Test dependencies not properly initialized")
         }
+        
+        worker.stubSuccessResponse(with: [])
+        
+        // When
+        interactor?.fetchArticles(request: Articles.FetchArticles.Request())
+        
+        // Then
+        XCTAssertEqual(presenter.presentArticlesCallCount, 1, "Should call present articles exactly once")
+        XCTAssertEqual(presenter.presentErrorCallCount, 0, "Should not call present error")
+        XCTAssertNotNil(presenter.lastArticlesResponse, "Should receive articles response")
     }
     
-}
-
-class ArticlesRouterSpy: ArticlesRoutingLogic {
-    func routeToArticleDetail(id: Int) {
+    func test_givenFailedResponse_whenFetchingArticles_shouldPresentError() {
+        // Given
+        guard let worker = worker, let presenter = presenter else {
+            return XCTFail("Test dependencies not properly initialized")
+        }
         
+        let expectedError = NetworkError.decodingError
+        worker.stubFailureResponse(with: expectedError)
+        
+        // When
+        interactor?.fetchArticles(request: Articles.FetchArticles.Request())
+        
+        // Then
+        XCTAssertEqual(presenter.presentErrorCallCount, 1, "Should call present error exactly once")
+        XCTAssertEqual(presenter.presentArticlesCallCount, 0, "Should not call present articles")
+        XCTAssertEqual(presenter.lastErrorResponse?.errorMessage, expectedError.localizedDescription)
     }
-}
-
-
-enum NetworkError: Error {
-    case invalidURL
-    case noData
-    case decodingError
+    
+    func test_givenArticleSelection_whenSelectingArticle_shouldRouteToDetail() {
+        // Given
+        guard let router = router else {
+            return XCTFail("Router dependency not properly initialized")
+        }
+        
+        let testId = 123
+        let request = Articles.DidSelectArticle.Request(id: testId)
+        
+        // When
+        interactor?.didSelectArticle(request: request)
+        
+        // Then
+        XCTAssertEqual(router.routeToArticleDetailCallCount, 1, "Should call route to detail exactly once")
+        XCTAssertEqual(router.routedArticleIds.first, testId, "Should route with correct article ID")
+    }
+    
+    // MARK: - Helper Methods
+    private func setupTestComponents() {
+        let newPresenter = ArticlesPresenterSpy()
+        let newWorker = ArticlesWorkerSpy()
+        let newRouter = ArticlesRouterSpy()
+        
+        presenter = newPresenter
+        worker = newWorker
+        router = newRouter
+        
+        interactor = ArticlesInteractor(
+            presenter: newPresenter,
+            worker: newWorker,
+            router: newRouter
+        )
+    }
+    
+    private func cleanUpTestComponents() {
+        interactor = nil
+        presenter?.reset()
+        presenter = nil
+        worker?.reset()
+        worker = nil
+        router?.reset()
+        router = nil
+    }
 }

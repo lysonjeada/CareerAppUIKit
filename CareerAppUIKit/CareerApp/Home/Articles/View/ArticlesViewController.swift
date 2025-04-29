@@ -17,7 +17,7 @@ protocol ArticlesDisplayLogic: AnyObject {
 
 class ArticlesViewController: UIViewController, ArticlesDisplayLogic {
     var interactor: ArticlesBusinessLogic?
-    private let dataStore: ArticlesDataStoreProtocol
+    var dataStore: ArticlesDataStoreProtocol
     
     private var displayedArticles: [DisplayedArticle] {
         get { dataStore.displayedArticles }
